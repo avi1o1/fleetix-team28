@@ -1,12 +1,18 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import L from 'leaflet';
+// import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Globe, AlertCircle, Sun, Moon, Users, Navigation } from 'lucide-react';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
+
+let L: any;
+
+if (typeof window !== 'undefined') {
+    L = require('leaflet');
+}
 
 const ManyToManyRouting: React.FC = () => {
     const mapRef = useRef<L.Map | null>(null);
@@ -39,6 +45,7 @@ const ManyToManyRouting: React.FC = () => {
 
     // Initialize map and theme
     useEffect(() => {
+        // Check if window is defined (client-side only)
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             setIsDarkMode(true);
@@ -153,175 +160,175 @@ const ManyToManyRouting: React.FC = () => {
             display_name: data[0].display_name,
         };
     };
-// Find the optimal route using either exhaustive search or heuristic approach
-const findOptimalRoute = (durations: number[], numLocations: number): number[] => {
-    // If there are 8 or fewer locations, use exhaustive search for the optimal solution
-    if (numLocations <= 8) {
-        return findOptimalRouteExhaustive(durations, numLocations);
-    }
-
-    // For larger datasets, use nearest neighbor with 2-opt improvement
-    return findOptimalRouteNearestNeighbor2Opt(durations, numLocations);
-};
-
-// Exhaustive search for optimal TSP solution (only for small datasets)
-const findOptimalRouteExhaustive = (durations: number[], numLocations: number): number[] => {
-    const pickupCount = numLocations - 1; // Exclude destination
-    const destinationIdx = pickupCount; // Last index is destination
-
-    // Generate all permutations of pickup locations (0 to pickupCount-1)
-    const allPermutations = generatePermutations([...Array(pickupCount).keys()]);
-
-    let bestRoute: number[] = [];
-    let bestDistance = Infinity;
-
-    // Evaluate each permutation
-    for (const perm of allPermutations) {
-        let totalDistance = 0;
-
-        // Calculate distance from first pickup to subsequent pickups
-        for (let i = 0; i < perm.length - 1; i++) {
-            const fromIdx = perm[i];
-            const toIdx = perm[i + 1];
-            totalDistance += durations[fromIdx * numLocations + toIdx];
+    // Find the optimal route using either exhaustive search or heuristic approach
+    const findOptimalRoute = (durations: number[], numLocations: number): number[] => {
+        // If there are 8 or fewer locations, use exhaustive search for the optimal solution
+        if (numLocations <= 8) {
+            return findOptimalRouteExhaustive(durations, numLocations);
         }
 
-        // Add distance from last pickup to destination
-        const lastPickup = perm[perm.length - 1];
-        totalDistance += durations[lastPickup * numLocations + destinationIdx];
+        // For larger datasets, use nearest neighbor with 2-opt improvement
+        return findOptimalRouteNearestNeighbor2Opt(durations, numLocations);
+    };
 
-        if (totalDistance < bestDistance) {
-            bestDistance = totalDistance;
-            bestRoute = [...perm];
-        }
-    }
+    // Exhaustive search for optimal TSP solution (only for small datasets)
+    const findOptimalRouteExhaustive = (durations: number[], numLocations: number): number[] => {
+        const pickupCount = numLocations - 1; // Exclude destination
+        const destinationIdx = pickupCount; // Last index is destination
 
-    // Add destination to the end of the route
-    bestRoute.push(destinationIdx);
-    return bestRoute;
-};
+        // Generate all permutations of pickup locations (0 to pickupCount-1)
+        const allPermutations = generatePermutations([...Array(pickupCount).keys()]);
 
-// Generate all permutations of an array
-const generatePermutations = (arr: number[]): number[][] => {
-    if (arr.length <= 1) return [arr];
+        let bestRoute: number[] = [];
+        let bestDistance = Infinity;
 
-    const result: number[][] = [];
+        // Evaluate each permutation
+        for (const perm of allPermutations) {
+            let totalDistance = 0;
 
-    for (let i = 0; i < arr.length; i++) {
-        const current = arr[i];
-        const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
-        const permsOfRemaining = generatePermutations(remaining);
+            // Calculate distance from first pickup to subsequent pickups
+            for (let i = 0; i < perm.length - 1; i++) {
+                const fromIdx = perm[i];
+                const toIdx = perm[i + 1];
+                totalDistance += durations[fromIdx * numLocations + toIdx];
+            }
 
-        for (const perm of permsOfRemaining) {
-            result.push([current, ...perm]);
-        }
-    }
+            // Add distance from last pickup to destination
+            const lastPickup = perm[perm.length - 1];
+            totalDistance += durations[lastPickup * numLocations + destinationIdx];
 
-    return result;
-};
-
-// Nearest Neighbor with 2-opt improvement for larger datasets
-const findOptimalRouteNearestNeighbor2Opt = (durations: number[], numLocations: number): number[] => {
-    // First get initial route using Nearest Neighbor
-    const route = nearestNeighborTSP(durations, numLocations);
-
-    // Then improve it with 2-opt
-    return twoOptImprovement(route, durations, numLocations);
-};
-
-// Nearest Neighbor algorithm
-const nearestNeighborTSP = (durations: number[], numLocations: number): number[] => {
-    const pickupCount = numLocations - 1;
-    const visited: boolean[] = new Array(numLocations).fill(false);
-    const route: number[] = [0]; // Start with the first pickup location (index 0)
-    visited[0] = true;
-
-    // Visit all pickup locations
-    for (let i = 1; i < pickupCount; i++) {
-        const lastVisited = route[route.length - 1];
-        let nearest = -1;
-        let minDistance = Infinity;
-
-        // Find nearest unvisited location
-        for (let j = 0; j < pickupCount; j++) {
-            if (!visited[j]) {
-                const dist = durations[lastVisited * numLocations + j];
-                if (dist < minDistance) {
-                    nearest = j;
-                    minDistance = dist;
-                }
+            if (totalDistance < bestDistance) {
+                bestDistance = totalDistance;
+                bestRoute = [...perm];
             }
         }
 
-        if (nearest !== -1) {
-            route.push(nearest);
-            visited[nearest] = true;
+        // Add destination to the end of the route
+        bestRoute.push(destinationIdx);
+        return bestRoute;
+    };
+
+    // Generate all permutations of an array
+    const generatePermutations = (arr: number[]): number[][] => {
+        if (arr.length <= 1) return [arr];
+
+        const result: number[][] = [];
+
+        for (let i = 0; i < arr.length; i++) {
+            const current = arr[i];
+            const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
+            const permsOfRemaining = generatePermutations(remaining);
+
+            for (const perm of permsOfRemaining) {
+                result.push([current, ...perm]);
+            }
         }
-    }
 
-    // Add destination as the final location
-    route.push(pickupCount);
+        return result;
+    };
 
-    return route;
-};
+    // Nearest Neighbor with 2-opt improvement for larger datasets
+    const findOptimalRouteNearestNeighbor2Opt = (durations: number[], numLocations: number): number[] => {
+        // First get initial route using Nearest Neighbor
+        const route = nearestNeighborTSP(durations, numLocations);
 
-// Calculate total distance of a route
-const calculateRouteDistance = (route: number[], durations: number[], numLocations: number): number => {
-    let distance = 0;
-    for (let i = 0; i < route.length - 1; i++) {
-        const from = route[i];
-        const to = route[i + 1];
-        distance += durations[from * numLocations + to];
-    }
-    return distance;
-};
+        // Then improve it with 2-opt
+        return twoOptImprovement(route, durations, numLocations);
+    };
 
-// 2-opt improvement algorithm
-const twoOptImprovement = (route: number[], durations: number[], numLocations: number): number[] => {
-    let improved = true;
-    let bestDistance = calculateRouteDistance(route, durations, numLocations);
-    let bestRoute = [...route];
+    // Nearest Neighbor algorithm
+    const nearestNeighborTSP = (durations: number[], numLocations: number): number[] => {
+        const pickupCount = numLocations - 1;
+        const visited: boolean[] = new Array(numLocations).fill(false);
+        const route: number[] = [0]; // Start with the first pickup location (index 0)
+        visited[0] = true;
 
-    while (improved) {
-        improved = false;
+        // Visit all pickup locations
+        for (let i = 1; i < pickupCount; i++) {
+            const lastVisited = route[route.length - 1];
+            let nearest = -1;
+            let minDistance = Infinity;
 
-        // Try all possible 2-opt swaps (excluding the destination)
-        for (let i = 0; i < route.length - 2; i++) {
-            for (let j = i + 1; j < route.length - 1; j++) {
-                // Skip if they're adjacent
-                if (j - i === 1) continue;
-
-                // Create new route with 2-opt swap
-                const newRoute = twoOptSwap(bestRoute, i, j);
-                const newDistance = calculateRouteDistance(newRoute, durations, numLocations);
-
-                if (newDistance < bestDistance) {
-                    bestDistance = newDistance;
-                    bestRoute = [...newRoute];
-                    improved = true;
-                    break;
+            // Find nearest unvisited location
+            for (let j = 0; j < pickupCount; j++) {
+                if (!visited[j]) {
+                    const dist = durations[lastVisited * numLocations + j];
+                    if (dist < minDistance) {
+                        nearest = j;
+                        minDistance = dist;
+                    }
                 }
             }
-            if (improved) break;
+
+            if (nearest !== -1) {
+                route.push(nearest);
+                visited[nearest] = true;
+            }
         }
-    }
 
-    return bestRoute;
-};
+        // Add destination as the final location
+        route.push(pickupCount);
 
-// Perform 2-opt swap: reverse the order of routes between i and j
-const twoOptSwap = (route: number[], i: number, j: number): number[] => {
-    const newRoute = [...route];
-    // Reverse the segment between positions i and j
-    while (i < j) {
-        const temp = newRoute[i];
-        newRoute[i] = newRoute[j];
-        newRoute[j] = temp;
-        i++;
-        j--;
-    }
-    return newRoute;
-};
+        return route;
+    };
+
+    // Calculate total distance of a route
+    const calculateRouteDistance = (route: number[], durations: number[], numLocations: number): number => {
+        let distance = 0;
+        for (let i = 0; i < route.length - 1; i++) {
+            const from = route[i];
+            const to = route[i + 1];
+            distance += durations[from * numLocations + to];
+        }
+        return distance;
+    };
+
+    // 2-opt improvement algorithm
+    const twoOptImprovement = (route: number[], durations: number[], numLocations: number): number[] => {
+        let improved = true;
+        let bestDistance = calculateRouteDistance(route, durations, numLocations);
+        let bestRoute = [...route];
+
+        while (improved) {
+            improved = false;
+
+            // Try all possible 2-opt swaps (excluding the destination)
+            for (let i = 0; i < route.length - 2; i++) {
+                for (let j = i + 1; j < route.length - 1; j++) {
+                    // Skip if they're adjacent
+                    if (j - i === 1) continue;
+
+                    // Create new route with 2-opt swap
+                    const newRoute = twoOptSwap(bestRoute, i, j);
+                    const newDistance = calculateRouteDistance(newRoute, durations, numLocations);
+
+                    if (newDistance < bestDistance) {
+                        bestDistance = newDistance;
+                        bestRoute = [...newRoute];
+                        improved = true;
+                        break;
+                    }
+                }
+                if (improved) break;
+            }
+        }
+
+        return bestRoute;
+    };
+
+    // Perform 2-opt swap: reverse the order of routes between i and j
+    const twoOptSwap = (route: number[], i: number, j: number): number[] => {
+        const newRoute = [...route];
+        // Reverse the segment between positions i and j
+        while (i < j) {
+            const temp = newRoute[i];
+            newRoute[i] = newRoute[j];
+            newRoute[j] = temp;
+            i++;
+            j--;
+        }
+        return newRoute;
+    };
     const calculateRoute = async () => {
         if (destinations.some((dest) => !dest.address.trim())) {
             setError('Please enter all destination addresses');
@@ -450,9 +457,8 @@ const twoOptSwap = (route: number[], i: number, j: number): number[] => {
                 cabRoutes.forEach((cab, cabIndex) => {
                     cab.orderedPickups.forEach((pickup) => {
                         const pickupIcon = L.divIcon({
-                            html: `<div class="flex items-center justify-center bg-${
-                                routeColors[cabIndex % routeColors.length] === '#FF0000' ? 'red' : 'blue'
-                            }-500 text-white rounded-full w-8 h-8 border-2 border-white"><span>${pickup.order}</span></div>`,
+                            html: `<div class="flex items-center justify-center bg-${routeColors[cabIndex % routeColors.length] === '#FF0000' ? 'red' : 'blue'
+                                }-500 text-white rounded-full w-8 h-8 border-2 border-white"><span>${pickup.order}</span></div>`,
                             className: '',
                             iconSize: [32, 32],
                             iconAnchor: [16, 16],
