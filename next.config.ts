@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { Mr_Bedfort } from "next/font/google";
 
 const nextConfig: NextConfig = {
   eslint: {

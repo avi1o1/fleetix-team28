@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Globe, AlertCircle, Sun, Moon, X } from 'lucide-react';
 import Link from 'next/link';

@@ -43,44 +43,46 @@ export default function About() {
       {/* Hero section */}
       <div className="min-h-screen flex flex-col align-center justify-center items-center">
         <div className={`py-20 transition-colors duration-300`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mt-10">
-                <h1 className={`text-4xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'} sm:text-5xl lg:text-7xl transition-colors duration-300`}>
+              <h1 className={`text-4xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'} text-5xl md:text-7xl transition-colors duration-300`}>
                 About <span className="text-green-500">Fleetix</span>
-                </h1>
-                <p className={`mt-8 text-2xl max-w-4xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} transition-colors duration-300`}>
-                We're a team of passionate developers working to revolutionize employee transportation management through innovative technology.
-                </p>
+              </h1>
+              <p className={`mt-8 text-2xl max-w-4xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} transition-colors duration-300`}>
+                We&apos;re a team of passionate developers working to revolutionize employee transportation management through innovative technology.
+              </p>
             </div>
-            </div>
+          </div>
         </div>
 
         {/* Mission section */}
         <div className="py-20 transition-colors duration-300">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-                <div>
-                <h2 className={`text-5xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-300`}>
-                    Our Mission
+              <div>
+                <h2 className={`text-3xl md:text-5xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-300`}>
+                  Our Mission
                 </h2>
                 <p className={`mt-4 text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} transition-colors duration-300 text-justify`}>
-                    At Fleetix, we're committed to solving the complex challenges of employee transportation management. Our mission is to provide a comprehensive platform that optimizes routes, reduces costs, and improves the overall experience for both employers and employees.
+                  At Fleetix, we&apos;re committed to solving the complex challenges of employee transportation management. Our mission is to provide a comprehensive platform that optimizes routes, reduces costs, and improves the overall experience for both employers and employees.
                 </p>
-                              <p className={`mt-4 text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} transition-colors duration-300 text-justify`}>
-                    We believe that efficient transportation management not only saves companies money but also contributes to employee satisfaction and environmental sustainability by reducing carbon emissions through optimized routes.
+                <p className={`mt-4 text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-500'} transition-colors duration-300 text-justify`}>
+                  We believe that efficient transportation management not only saves companies money but also contributes to employee satisfaction and environmental sustainability by reducing carbon emissions through optimized routes.
                 </p>
-                </div>
-                <div className="mt-10 lg:mt-0">
+              </div>
+              <div className="mt-10 lg:mt-0">
                 <div className={`aspect-w-3 aspect-h-2 rounded-lg overflow-hidden shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                    <div className="h-96 flex items-center justify-center">
-                    <svg className="w-40 h-40 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    </div>
+                  <div className="h-96 flex items-center justify-center">
+                    <img
+                      src="map.png"
+                      alt="Map"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
                 </div>
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
         </div>
       </div>
 

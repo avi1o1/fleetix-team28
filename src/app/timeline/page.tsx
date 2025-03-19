@@ -352,24 +352,24 @@ export default function TimelinePage() {
               <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-white'} p-6 rounded-lg shadow-md`}>
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white mb-4">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                   </svg>
                 </div>
                 <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Fleet Management</h3>
                 <p className={`mt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                  Implementation of fleet management features for tracking, monitoring, and managing vehicle fleets.
+                  Implementing constraints handling for passenger capacity, timing preferences to attain the final goal of employee transportation.
                 </p>
               </div>
-
+          
               <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-white'} p-6 rounded-lg shadow-md`}>
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white mb-4">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
-                <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Integrating Google APIs for Routing</h3>
+                <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>User-specific Features</h3>
                 <p className={`mt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                  Implementation of Google Maps APIs for accurate and reliable routing and location data.
+                  Implementing login and user levels for accessing / restricting various features based on user level (Admin, Employee, Driver)
                 </p>
               </div>
             </div>

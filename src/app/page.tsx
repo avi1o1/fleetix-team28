@@ -2,13 +2,17 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const words = ["Transportation", "Management", "Planning", "Logistics", "Coordination"];
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
+  // Theme handling
   useEffect(() => {
     // Check for saved theme preference in localStorage
     const savedTheme = localStorage.getItem('theme');
@@ -37,8 +41,14 @@ export default function Home() {
     }
   };
 
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const words = ["Transportation", "Management", "Planning", "Logistics", "Coordination"];
+  // Word rotation effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [words.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,8 +64,8 @@ export default function Home() {
       <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
       {/* Hero section */}
-      <div className={`${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} flex flex-col align-center justify-center min-h-screen items-center transition-colors duration-300`}>
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:py-16 sm:px-6 lg:px-8 lg:flex lg:justify-between lg:items-center">
+      <div className={`${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} flex flex-col py-32 sm:py-16 align-center justify-center min-h-screen items-center transition-colors duration-300`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:flex lg:justify-between lg:items-center">
           <div className="text-left sm:text-justify sm:pr-16">
             <h1 className={`flex flex-col text-5xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'} sm:text-5xl lg:text-8xl transition-colors duration-300`}>
               Optimize your
@@ -94,17 +104,18 @@ export default function Home() {
           </div>
           <div className="mt-12 lg:mt-0 lg:flex-shrink-0">
             <div className={`w-full h-80 sm:h-96 lg:h-[28rem] ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'} rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-all duration-300`}>
-              {/* TODO: Replace with actual image in production */}
               <div className={`w-full h-full flex items-center justify-center ${isDarkMode ? 'bg-opacity-50 bg-gray-700' : 'bg-opacity-50 bg-gray-300'}`}>
-                <svg className="w-[33vw] h-40 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-                </svg>
+                <img
+                  src="map.png"
+                  alt="Map"
+                  className="h-full w-full object-cover"
+                />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="w-full flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <div className="w-full pt-16 md:pt-24 flex gap-5 items-center justify-center sm:space-x-4">
           <Link href="/about" className={`px-8 py-3 text-center border border-transparent text-base font-medium rounded-md ${isDarkMode ? 'text-white bg-gray-800 hover:bg-gray-700' : 'text-gray-800 bg-gray-200 hover:bg-gray-300'} sm:py-4 sm:text-lg sm:px-10 transform hover:scale-105 transition-all duration-300`}>
             Learn More
           </Link>
