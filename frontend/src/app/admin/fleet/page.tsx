@@ -24,7 +24,7 @@ const L = dynamic(
 // Import CSS in a way that works with SSR
 import 'leaflet/dist/leaflet.css';
 
-const ManageRoutyes: React.FC = () => {
+const ManageRoutes: React.FC = () => {
     const mapRef = useRef<L.Map | null>(null);
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const routeLayerRef = useRef<L.LayerGroup | null>(null);

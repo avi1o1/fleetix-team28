@@ -8,8 +8,11 @@ import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { v4 as uuidv4 } from 'uuid';
 
-// Import Leaflet directly (not as a React component)
-import L from 'leaflet';
+// Dynamically import Leaflet with no SSR
+const L = dynamic(
+    () => import('leaflet').then(mod => mod.default),
+    { ssr: false }
+);
 
 // Import CSS in a way that works with SSR
 import 'leaflet/dist/leaflet.css';
@@ -1228,9 +1231,9 @@ const ManyToManyRouting: React.FC = () => {
                                             </div>
                                         )}
                                     </div>
-<div className="space-y-4">
-    {routeInfo.cabs.map((cab: any) => (
-        <div
+                                    <div className="space-y-4">
+                                        {routeInfo.cabs.map((cab: any) => (
+                                            <div
                                                 key={cab.id}
                                                 className={`p-4 rounded-lg border-l-4 shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
                                                 style={{ borderLeftColor: cab.color }}
