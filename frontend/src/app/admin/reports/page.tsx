@@ -205,7 +205,7 @@ const EmployeeRoutes: React.FC = () => {
       }
 
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/employees`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -233,7 +233,7 @@ const EmployeeRoutes: React.FC = () => {
       }
 
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/employees/${employeeId}/routes`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/${employeeId}/routes`,
         {
           headers: {
             Authorization: `Bearer ${token}`

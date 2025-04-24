@@ -95,7 +95,7 @@ export default function Dashboard() {
     const [allRoutePoints, setAllRoutePoints] = useState<MapPoint[]>([]);
 
     // API base URL from environment variable
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     useEffect(() => {
         // Check for saved theme preference in localStorage
@@ -281,7 +281,18 @@ export default function Dashboard() {
             const response = await authAxios().get(`/drivers/${driverId}/routes`);
 
             // Transform the routes with proper date handling
-            const routesWithDates = response.data.map(route => ({
+            interface DriverRoute {
+                routeId: string;
+                source: string;
+                destination: string;
+                startTime: Date;
+                endTime: Date;
+                date: Date;
+                totalDistance: number;
+                estimatedTime: number;
+            }
+
+            const routesWithDates: DriverRoute[] = (response.data as any[]).map((route: any): DriverRoute => ({
                 ...route,
                 // Convert string dates to Date objects with fallbacks
                 startTime: route.startTime ? new Date(route.startTime) : new Date(),
@@ -309,7 +320,18 @@ export default function Dashboard() {
             const response = await authAxios().get(`/employees/${userId}/routes`);
 
             // Transform the routes with proper date handling
-            const routesWithDates = response.data.map(route => ({
+            interface EmployeeRouteApiResponse {
+                routeId: string;
+                source: string;
+                destination: string;
+                startTime?: string;
+                endTime?: string;
+                date?: string;
+                totalDistance?: number;
+                estimatedTime?: number;
+            }
+
+            const routesWithDates: EmployeeRoute[] = (response.data as EmployeeRouteApiResponse[]).map((route): EmployeeRoute => ({
                 ...route,
                 // Convert string dates to Date objects with fallbacks
                 startTime: route.startTime ? new Date(route.startTime) : new Date(),

@@ -86,7 +86,7 @@ export default function ProfilePage() {
     const suggestionsRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     // Get token from local storage
     const getToken = () => {
@@ -390,7 +390,9 @@ export default function ProfilePage() {
             handleSaveChanges();
         } else {
             // If entering edit mode, initialize form data with current user data
-            setFormData({ ...userData });
+            if (userData) {
+                setFormData({ ...userData });
+            }
         }
         setEditMode(!editMode);
     };
@@ -801,16 +803,18 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* User Sidebar Component */}
-                    <UserSidebar
-                        userData={userData}
-                        formData={formData}
-                        editMode={editMode}
-                        isDarkMode={isDarkMode}
-                        handleEditToggle={handleEditToggle}
-                        cancelEdit={cancelEdit}
-                        handleInputChange={handleInputChange}
-                        handleLogout={handleLogout}
-                    />
+                    {formData && (
+                        <UserSidebar
+                            userData={userData}
+                            formData={formData}
+                            editMode={editMode}
+                            isDarkMode={isDarkMode}
+                            handleEditToggle={handleEditToggle}
+                            cancelEdit={cancelEdit}
+                            handleInputChange={handleInputChange}
+                            handleLogout={handleLogout}
+                        />
+                    )}
 
                     {/* Main content */}
                     <div className="col-span-1 lg:col-span-2 space-y-6">

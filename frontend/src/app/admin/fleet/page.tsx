@@ -24,7 +24,7 @@ const L = dynamic(
 // Import CSS in a way that works with SSR
 import 'leaflet/dist/leaflet.css';
 
-const ManageRoutes: React.FC = () => {
+const ManageRoutyes: React.FC = () => {
     const mapRef = useRef<L.Map | null>(null);
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const routeLayerRef = useRef<L.LayerGroup | null>(null);
@@ -145,7 +145,7 @@ const ManageRoutes: React.FC = () => {
                 const token = localStorage.getItem('token');
                 if (!token) throw new Error('Authentication required');
 
-                const response = await fetch('http://localhost:3001/employees', {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -1108,7 +1108,7 @@ const ManageRoutes: React.FC = () => {
                     })
                 };
 
-                return fetch('http://localhost:3001/auth/save-route', {
+                return fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/save-route`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

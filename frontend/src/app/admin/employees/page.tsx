@@ -81,7 +81,7 @@ const ManageEmployees: React.FC = () => {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // API base URL from environment variable - make sure this matches your backend URL
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     // Get token from local storage
     const getToken = () => {

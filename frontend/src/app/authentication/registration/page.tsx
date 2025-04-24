@@ -56,7 +56,7 @@ const RegistrationPage = () => {
       setLoading(true);
 
       // Submit registration request to backend
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/register`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register`, {
         name: formData.name,
         email: formData.email,
         password: formData.password,

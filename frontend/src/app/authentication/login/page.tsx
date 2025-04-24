@@ -55,7 +55,7 @@ const LoginPage = () => {
       setLoading(true);
 
       // Submit login request to backend
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/login`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
         email: formData.email,
         password: formData.password
       });

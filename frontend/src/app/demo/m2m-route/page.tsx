@@ -8,11 +8,8 @@ import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { v4 as uuidv4 } from 'uuid';
 
-// Dynamically import Leaflet with no SSR
-const L = dynamic(
-    () => import('leaflet').then(mod => mod.default),
-    { ssr: false }
-);
+// Import Leaflet directly (not as a React component)
+import L from 'leaflet';
 
 // Import CSS in a way that works with SSR
 import 'leaflet/dist/leaflet.css';
@@ -508,8 +505,8 @@ const ManyToManyRouting: React.FC = () => {
             );
 
             // Combine all pickups from all destinations for clustering
-            const allPickups = destCoords.flatMap(dest =>
-                dest.pickups.map(p => ({
+            const allPickups: { lat: number; lon: number; data: { lat: number; lon: number; display_name: string } }[] = destCoords.flatMap(dest =>
+                dest.pickups.map((p: { lat: number; lon: number; display_name: string }) => ({
                     lat: p.lat,
                     lon: p.lon,
                     data: p
@@ -534,7 +531,18 @@ const ManyToManyRouting: React.FC = () => {
             };
 
             // Cluster pickups based on number of cabs
-            const clusters = kMeansCluster(allPickups, actualCabCount);
+            // Type assertion to include 'data' property for downstream usage
+            interface ClusterPoint {
+                lat: number;
+                lon: number;
+                data: {
+                    lat: number;
+                    lon: number;
+                    display_name: string;
+                };
+            }
+
+            const clusters = kMeansCluster(allPickups as ClusterPoint[], actualCabCount);
 
             // Calculate routes for each cluster (cab)
             const cabRoutes = await Promise.all(
@@ -543,10 +551,14 @@ const ManyToManyRouting: React.FC = () => {
                     const cabRouteResults = await Promise.all(
                         destCoords.map(async (dest, destIndex) => {
                             // Get pickups assigned to this cab for current destination
-                            const cabDestPickups = cluster
-                                .filter(p => dest.pickups.some(dp =>
-                                    dp.lat === p.lat && dp.lon === p.lon))
-                                .map(p => p.data);
+                            // Ensure the cluster is properly typed as ClusterPoint[]
+                            const cabDestPickups: { lat: number; lon: number; display_name: string }[] = (cluster as ClusterPoint[])
+                                .filter((p) => dest.pickups.some(dp => dp.lat === p.lat && dp.lon === p.lon))
+                                .map((p) => ({
+                                    lat: p.lat,
+                                    lon: p.lon,
+                                    display_name: p.data.display_name, // Accessing 'data' safely
+                                }));
 
                             if (cabDestPickups.length === 0) return null;
 
@@ -627,7 +639,7 @@ const ManyToManyRouting: React.FC = () => {
                                 }).addTo(routeLayerRef.current);
                             }
 
-                            const pickupTimes = [];
+                            const pickupTimes: { pickupTime: string; readyTime: string }[] = [];
                             let cumulativeDuration = 0;
 
                             // Work backwards from destination time
@@ -690,10 +702,12 @@ const ManyToManyRouting: React.FC = () => {
                         iconAnchor: [16, 16],
                     });
 
-                    L.marker([dest.lat, dest.lon], { icon: destIcon })
-                        .bindPopup(`<b>Destination ${index + 1}:</b><br>${dest.display_name}`)
-                        .addTo(markersLayerRef.current)
-                        .openPopup();
+                    if (markersLayerRef.current) {
+                        L.marker([dest.lat, dest.lon], { icon: destIcon })
+                            .bindPopup(`<b>Destination ${index + 1}:</b><br>${dest.display_name}`)
+                            .addTo(markersLayerRef.current)
+                            .openPopup();
+                    }
                 });
 
                 // Draw pickup markers based on the optimized order
@@ -707,15 +721,17 @@ const ManyToManyRouting: React.FC = () => {
                                 iconAnchor: [16, 16],
                             });
 
-                            L.marker([pickup.coordinates.lat, pickup.coordinates.lon], { icon: pickupIcon })
-                                .bindPopup(`<b>Cab ${cab.id}, Pickup #${pickup.order}:</b><br>${pickup.address}`)
-                                .addTo(markersLayerRef.current);
+                            if (markersLayerRef.current) {
+                                L.marker([pickup.coordinates.lat, pickup.coordinates.lon], { icon: pickupIcon })
+                                    .bindPopup(`<b>Cab ${cab.id}, Pickup #${pickup.order}:</b><br>${pickup.address}`)
+                                    .addTo(markersLayerRef.current);
+                            }
                         });
                     });
                 });
 
                 // Create an array to store all marker positions
-                const markerPositions = [];
+                const markerPositions: [number, number][] = [];
 
                 // Add destination positions
                 destCoords.forEach((dest) => {
@@ -732,7 +748,7 @@ const ManyToManyRouting: React.FC = () => {
                 // Create a bounds object from the marker positions
                 const bounds = L.latLngBounds(markerPositions);
 
-                if (!bounds.isEmpty) {
+                if (bounds.isValid()) {
                     mapRef.current?.fitBounds(bounds, { padding: [50, 50] });
                 }
             }
@@ -786,16 +802,50 @@ const ManyToManyRouting: React.FC = () => {
             const currentDate = now.toISOString().split('T')[0];
 
             // Save each cab's route with employee data
-            const savePromises = routeInfo.cabs.map(async (cab, cabIndex) => {
+            const savePromises = routeInfo.cabs.map(async (cab: any, cabIndex: number) => {
                 const employeeId = employeeIds[cabIndex];
                 if (!employeeId) throw new Error(`Missing employee ID for cab ${cab.id}`);
 
-                return Promise.all(cab.routes.map(async (route) => {
+                return Promise.all(cab.routes.map(async (route: any) => {
                     if (!route) return null;
 
                     const routeEndTime = new Date(now.getTime() + route.duration * 60 * 1000);
 
-                    const routeData = {
+                    interface PickupDetail {
+                        address: string;
+                        readyTime: string;
+                        pickupTime: string;
+                        coordinates: {
+                            lat: number;
+                            lon: number;
+                            display_name?: string;
+                        };
+                    }
+
+                    interface RouteDetails {
+                        cabId: number;
+                        color: string;
+                        allPickups: PickupDetail[];
+                        waypoints: string[];
+                    }
+
+                    interface RouteData {
+                        routeId: string;
+                        // routeGroupId?: string;
+                        startTime: string;
+                        endTime: string;
+                        date: string;
+                        source: string;
+                        destination: string;
+                        totalDistance: number;
+                        estimatedTime: number;
+                        employeeIds: string[];
+                        assignedDriverId: string | null;
+                        restTime: number;
+                        routeDetails: string;
+                    }
+
+                    const routeData: RouteData = {
                         routeId: uuidv4(),
                         // routeGroupId: routeGroupId,
                         startTime: now.toISOString(),
@@ -811,17 +861,17 @@ const ManyToManyRouting: React.FC = () => {
                         routeDetails: JSON.stringify({
                             cabId: cab.id,
                             color: cab.color,
-                            allPickups: route.pickups.map(p => ({
+                            allPickups: route.pickups.map((p: PickupDetail) => ({
                                 address: p.address,
                                 readyTime: p.readyTime,
                                 pickupTime: p.pickupTime,
                                 coordinates: p.coordinates
                             })),
-                            waypoints: route.pickups.map(p => p.address)
-                        })
+                            waypoints: route.pickups.map((p: PickupDetail) => p.address)
+                        } as RouteDetails)
                     };
 
-                    const response = await fetch('http://localhost:3001/auth/save-route', {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/save-route`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1178,10 +1228,9 @@ const ManyToManyRouting: React.FC = () => {
                                             </div>
                                         )}
                                     </div>
-)}
-                                    <div className="space-y-4">
-                                        {routeInfo.cabs.map((cab) => (
-                                            <div
+<div className="space-y-4">
+    {routeInfo.cabs.map((cab: any) => (
+        <div
                                                 key={cab.id}
                                                 className={`p-4 rounded-lg border-l-4 shadow-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
                                                 style={{ borderLeftColor: cab.color }}
@@ -1199,7 +1248,7 @@ const ManyToManyRouting: React.FC = () => {
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    {cab.routes.map((route, idx) => (
+                                                    {cab.routes.map((route: any, idx: number) => (
                                                         <div key={idx} className="ml-2">
                                                             <div className="flex items-center">
                                                                 <MapPin className="flex-shrink-0 text-green-500 mr-2" size={16} />
@@ -1208,7 +1257,7 @@ const ManyToManyRouting: React.FC = () => {
                                                                 </span>
                                                             </div>
                                                             <ol className="mt-1 ml-6 space-y-2">
-                                                                {route.pickups.map((pickup) => (
+                                                                {route.pickups.map((pickup: any) => (
                                                                     <li
                                                                         key={pickup.order}
                                                                         className={`flex items-start ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}
