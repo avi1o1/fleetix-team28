@@ -81,7 +81,9 @@ AppDataSource.initialize()
     console.log("Database connection established");
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
-      console.log(`Available at http://localhost:${port}`);
+      // Update the console log to dynamically use the host and port from environment variables
+      const host = process.env.HOST || 'localhost';
+      console.log(`Available at http://${host}:${port}`);
     });
   })
   .catch((error) => {
