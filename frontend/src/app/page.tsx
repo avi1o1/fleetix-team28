@@ -18,13 +18,21 @@ export default function Home() {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
     } else if (savedTheme === 'light') {
       setIsDarkMode(false);
+      document.documentElement.classList.remove('dark');
     } else {
       // If no preference is set, check for system preference
-      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(prefersDarkMode);
       localStorage.setItem('theme', prefersDarkMode ? 'dark' : 'light');
+
+      if (prefersDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, []);
 
@@ -49,14 +57,6 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, [words.length]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-300`}>

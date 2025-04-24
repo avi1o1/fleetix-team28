@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
     isDarkMode: boolean;
@@ -9,7 +10,47 @@ interface NavbarProps {
 }
 
 const Navbar = ({ isDarkMode, toggleTheme }: NavbarProps) => {
+    const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userName, setUserName] = useState('');
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    // Check if user is logged in on component mount and when localStorage changes
+    useEffect(() => {
+        const checkAuthStatus = () => {
+            const token = localStorage.getItem('token');
+            const userString = localStorage.getItem('user');
+
+            if (token && userString) {
+                try {
+                    const user = JSON.parse(userString);
+                    setIsLoggedIn(true);
+                    setUserName(user.name || 'User');
+                    setIsAdmin(user.role === 'admin');
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    setIsLoggedIn(false);
+                    setUserName('');
+                    setIsAdmin(false);
+                }
+            } else {
+                setIsLoggedIn(false);
+                setUserName('');
+                setIsAdmin(false);
+            }
+        };
+
+        // Check auth status initially
+        checkAuthStatus();
+
+        // Add event listener for storage changes (if user logs in/out in another tab)
+        window.addEventListener('storage', checkAuthStatus);
+
+        return () => {
+            window.removeEventListener('storage', checkAuthStatus);
+        };
+    }, []);
 
     return (
         <nav className={`fixed w-full z-50 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md transition-colors duration-300`}>
@@ -41,24 +82,33 @@ const Navbar = ({ isDarkMode, toggleTheme }: NavbarProps) => {
                             <Link href="/timeline" className={`inline-flex items-center px-1 pt-1 font-medium ${isDarkMode ? 'text-white hover:text-green-400' : 'text-gray-900 hover:text-green-600'} transition-colors duration-300`}>
                                 Project Timeline
                             </Link>
+                            {isLoggedIn && (
+                                isAdmin ? (
+                                    <Link href="/admin" className={`inline-flex items-center px-1 pt-1 font-medium ${isDarkMode ? 'text-white hover:text-green-400' : 'text-gray-900 hover:text-green-600'} transition-colors duration-300`}>
+                                        Admin Panel
+                                    </Link>
+                                ) : (
+                                    <Link href="/dashboard" className={`inline-flex items-center px-1 pt-1 font-medium ${isDarkMode ? 'text-white hover:text-green-400' : 'text-gray-900 hover:text-green-600'} transition-colors duration-300`}>
+                                        Dashboard
+                                    </Link>
+                                )
+                            )}
                         </div>
 
-                        {/* Theme toggle button */}
+                        {/* Login/Profile icon display */}
                         <div className="hidden sm:ml-4 sm:flex sm:items-center">
-                            <button
-                                onClick={toggleTheme}
-                                className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 text-yellow-300' : 'bg-gray-100 text-gray-600'} focus:outline-none transition-colors duration-300`}
-                            >
-                                {isDarkMode ? (
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            {isLoggedIn ? (
+                                <Link href="/profile"
+                                    className={`p-2 rounded-full ${isDarkMode ? 'text-white hover:text-green-400 hover:bg-gray-700' : 'text-gray-600 hover:text-green-500 hover:bg-gray-100'} transition-all duration-300`}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                ) : (
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                    </svg>
-                                )}
-                            </button>
+                                </Link>
+                            ) : (
+                                <Link href="/authentication/login" className={`ml-4 px-4 py-2 rounded-md font-medium ${isDarkMode ? 'bg-green-500 hover:bg-green-400 text-white' : 'bg-green-400 hover:bg-green-500 text-white'} transition-colors duration-300`}>
+                                    Login
+                                </Link>
+                            )}
                         </div>
                     </div>
 
@@ -100,23 +150,29 @@ const Navbar = ({ isDarkMode, toggleTheme }: NavbarProps) => {
                         <Link href="/timeline" className={`block px-3 py-2 rounded-md text-base font-medium ${isDarkMode ? 'text-white hover:text-green-400 hover:bg-gray-700' : 'text-gray-900 hover:text-green-600 hover:bg-gray-100'} transition-colors duration-300`}>
                             Project Timeline
                         </Link>
-                        <button
-                            onClick={toggleTheme}
-                            className={`mt-4 w-full flex items-center justify-center px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-yellow-300' : 'bg-gray-100 text-gray-600'} rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-300`}
-                        >
-                            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                            <span className="ml-2">
-                                {isDarkMode ? (
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                    </svg>
-                                ) : (
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                    </svg>
-                                )}
-                            </span>
-                        </button>
+                        {isLoggedIn && (
+                            isAdmin ? (
+                                <Link href="/admin" className={`block px-3 py-2 rounded-md text-base font-medium ${isDarkMode ? 'text-white hover:text-green-400 hover:bg-gray-700' : 'text-gray-900 hover:text-green-600 hover:bg-gray-100'} transition-colors duration-300`}>
+                                    Admin Panel
+                                </Link>
+                            ) : (
+                                <Link href="/dashboard" className={`block px-3 py-2 rounded-md text-base font-medium ${isDarkMode ? 'text-white hover:text-green-400 hover:bg-gray-700' : 'text-gray-900 hover:text-green-600 hover:bg-gray-100'} transition-colors duration-300`}>
+                                    Dashboard
+                                </Link>
+                            )
+                        )}
+
+                        {/* Login/Profile for mobile */}
+                        {isLoggedIn ? (
+                            <Link href="/profile"
+                                className={`block px-3 py-2 rounded-md text-base font-medium ${isDarkMode ? 'text-white hover:text-green-400 hover:bg-gray-700' : 'text-gray-900 hover:text-green-600 hover:bg-gray-100'} transition-colors duration-300 mt-2`}>
+                                Profile
+                            </Link>
+                        ) : (
+                            <Link href="/authentication/login" className={`block px-3 py-2 rounded-md text-base font-medium text-center ${isDarkMode ? 'bg-green-500 hover:bg-green-400 text-white' : 'bg-green-400 hover:bg-green-500 text-white'} transition-colors duration-300 mt-2`}>
+                                Login
+                            </Link>
+                        )}
                     </div>
                 </div>
             )}
