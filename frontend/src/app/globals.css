@@ -19,3 +19,66 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4B5563;
+  border-radius: 6px;
+}
+
+/* For light mode */
+:root:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #D1D5DB;
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4B5563 transparent;
+}
+
+:root:not(.dark) .custom-scrollbar {
+  scrollbar-color: #D1D5DB transparent;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, and Opera */
+}
+
+/* Responsive form improvements */
+@media (max-width: 640px) {
+  .input-group-responsive {
+    flex-direction: column;
+  }
+
+  .input-group-responsive>* {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .input-group-responsive> :last-child {
+    margin-bottom: 0;
+  }
+
+  .form-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}

@@ -40,8 +40,8 @@ export default function About() {
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-300`}>
       <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      {/* Hero section */}
       <div className="min-h-screen flex flex-col align-center justify-center items-center">
+        {/* Hero section */}
         <div className={`py-20 transition-colors duration-300`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mt-10">
