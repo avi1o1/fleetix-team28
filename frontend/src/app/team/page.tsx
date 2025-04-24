@@ -11,7 +11,7 @@ export default function TeamPage() {
   useEffect(() => {
     // Mark that the component has mounted
     setHasMounted(true);
-    
+
     // Check for saved theme preference in localStorage
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
@@ -20,7 +20,7 @@ export default function TeamPage() {
       setIsDarkMode(false);
     } else {
       // If no preference is set, check for system preference
-      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(prefersDarkMode);
       localStorage.setItem('theme', prefersDarkMode ? 'dark' : 'light');
     }
@@ -118,15 +118,15 @@ export default function TeamPage() {
 
           <div className={`mt-12 grid gap-8 ${members.length <= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
             {members.map((member, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`${isDarkMode ? 'bg-gray-700' : 'bg-white'} rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300`}
               >
                 <div className={`h-48 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'} flex items-center justify-center`}>
-                  <img 
-                    src={member.imageUrl} 
-                    alt={member.name} 
-                    className="h-full w-full object-cover" 
+                  <img
+                    src={member.imageUrl}
+                    alt={member.name}
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div className="p-6">

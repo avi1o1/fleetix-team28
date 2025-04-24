@@ -123,7 +123,7 @@ const ManageEmployees: React.FC = () => {
             document.documentElement.classList.remove('dark');
         } else {
             // If no preference is set, check for system preference
-            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
             setIsDarkMode(prefersDarkMode);
             localStorage.setItem('theme', prefersDarkMode ? 'dark' : 'light');
             if (prefersDarkMode) document.documentElement.classList.add('dark');
@@ -865,7 +865,7 @@ const ManageEmployees: React.FC = () => {
                 applySelectedLocation={applySelectedLocation}
             />
 
-            <Footer isDarkMode={isDarkMode} />
+            <Footer />
         </div>
     );
 };

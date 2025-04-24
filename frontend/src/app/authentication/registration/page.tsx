@@ -35,18 +35,18 @@ const RegistrationPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     // Basic validation
     if (!formData.name || !formData.email || !formData.password) {
       setError('All fields are required');
       return;
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return;
@@ -54,7 +54,7 @@ const RegistrationPage = () => {
 
     try {
       setLoading(true);
-      
+
       // Submit registration request to backend
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/register`, {
         name: formData.name,
@@ -62,7 +62,7 @@ const RegistrationPage = () => {
         password: formData.password,
         role: formData.role
       });
-      
+
       if (response.status === 201) {
         // Registration successful, redirect to login
         router.push('/authentication/login?registered=true');
@@ -79,6 +79,8 @@ const RegistrationPage = () => {
     }
   };
 
+  const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -93,13 +95,13 @@ const RegistrationPage = () => {
             </Link>
           </p>
         </div>
-        
+
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
             <span className="block sm:inline">{error}</span>
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div className="mb-4">
@@ -116,7 +118,7 @@ const RegistrationPage = () => {
                 onChange={handleChange}
               />
             </div>
-            
+
             <div className="mb-4">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
               <input
@@ -131,7 +133,7 @@ const RegistrationPage = () => {
                 onChange={handleChange}
               />
             </div>
-            
+
             <div className="mb-4">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
               <input
@@ -146,7 +148,7 @@ const RegistrationPage = () => {
                 onChange={handleChange}
               />
             </div>
-            
+
             <div className="mb-4">
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
               <input
@@ -161,7 +163,7 @@ const RegistrationPage = () => {
                 onChange={handleChange}
               />
             </div>
-            
+
             <div className="mb-4">
               <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
               <select

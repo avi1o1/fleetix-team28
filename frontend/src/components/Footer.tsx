@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Github } from 'lucide-react';
 
-interface FooterProps {
-  isDarkMode: boolean;
-}
-
-const Footer: React.FC<FooterProps> = ({ isDarkMode }) => {
+const Footer: React.FC = () => {
   const [year, setYear] = useState<number>(2025);
 
   // Set current year

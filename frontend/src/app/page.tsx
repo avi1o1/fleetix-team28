@@ -24,7 +24,7 @@ export default function Home() {
       document.documentElement.classList.remove('dark');
     } else {
       // If no preference is set, check for system preference
-      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(prefersDarkMode);
       localStorage.setItem('theme', prefersDarkMode ? 'dark' : 'light');
 
@@ -126,7 +126,7 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   )
 }

@@ -26,7 +26,7 @@ const LoginPage = () => {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
     } else {
-      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(prefersDarkMode);
       localStorage.setItem('theme', prefersDarkMode ? 'dark' : 'light');
       if (prefersDarkMode) document.documentElement.classList.add('dark');

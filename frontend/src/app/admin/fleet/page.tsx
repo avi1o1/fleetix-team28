@@ -1,7 +1,7 @@
-'use client';
+'use client'
+
 import React, { useEffect, useRef, useState } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import dynamic from 'next/dynamic';
 import { Car, Clock, MapPin, AlertCircle, Sun, Moon, Users, Navigation, CheckCircle, ChevronLeft, Search, X, Building, Sliders } from 'lucide-react';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
@@ -9,6 +9,20 @@ import Navbar from '@/components/Navbar';
 import LocationModal from '@/components/profile/LocationModal';
 import { v4 as uuidv4 } from 'uuid';
 
+// Dynamically import Leaflet with no SSR
+const LeafletMap = dynamic(
+    () => import('@/components/LeafletMap'),
+    { ssr: false }
+);
+
+// Dynamically import Leaflet library
+const L = dynamic(
+    () => import('leaflet').then(mod => mod.default),
+    { ssr: false }
+);
+
+// Import CSS in a way that works with SSR
+import 'leaflet/dist/leaflet.css';
 
 const ManageRoutes: React.FC = () => {
     const mapRef = useRef<L.Map | null>(null);
@@ -58,6 +72,9 @@ const ManageRoutes: React.FC = () => {
 
     // Initialize map and theme
     useEffect(() => {
+        // Only run on the client side
+        if (typeof window === 'undefined') return;
+
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             setIsDarkMode(true);
@@ -76,6 +93,9 @@ const ManageRoutes: React.FC = () => {
     }, []);
 
     useEffect(() => {
+        // Only run on the client side
+        if (typeof window === 'undefined') return;
+
         if (mapContainerRef.current && !mapRef.current) {
             mapRef.current = L.map(mapContainerRef.current).setView([51.505, -0.09], 13);
 
@@ -101,6 +121,9 @@ const ManageRoutes: React.FC = () => {
     }, []);
 
     const toggleTheme = () => {
+        // Only run on the client side
+        if (typeof window === 'undefined') return;
+
         const newDarkModeValue = !isDarkMode;
         setIsDarkMode(newDarkModeValue);
         localStorage.setItem('theme', newDarkModeValue ? 'dark' : 'light');
@@ -113,6 +136,9 @@ const ManageRoutes: React.FC = () => {
 
     // Fetch all employees for dropdown
     useEffect(() => {
+        // Skip running on the server
+        if (typeof window === 'undefined') return;
+
         const fetchAllEmployees = async () => {
             try {
                 setIsEmployeesLoading(true);
@@ -605,6 +631,11 @@ const ManageRoutes: React.FC = () => {
             if (routeLayerRef.current) routeLayerRef.current.clearLayers();
             if (markersLayerRef.current) routeLayerRef.current.clearLayers();
 
+            // Ensure we're in browser environment
+            if (typeof window === 'undefined') {
+                throw new Error('Cannot run in server environment');
+            }
+
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Authentication required');
 
@@ -971,6 +1002,11 @@ const ManageRoutes: React.FC = () => {
         setSaveSuccess('');
 
         try {
+            // Ensure we're in browser environment
+            if (typeof window === 'undefined') {
+                throw new Error('Cannot run in server environment');
+            }
+
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Authentication required');
 
@@ -1527,7 +1563,7 @@ const ManageRoutes: React.FC = () => {
                 applySelectedLocation={applySelectedLocation}
             />
 
-            <Footer isDarkMode={isDarkMode} />
+            <Footer />
         </div>
     );
 };

@@ -108,7 +108,7 @@ export default function Dashboard() {
             document.documentElement.classList.remove('dark');
         } else {
             // If no preference is set, check for system preference
-            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
             setIsDarkMode(prefersDarkMode);
             localStorage.setItem('theme', prefersDarkMode ? 'dark' : 'light');
             if (prefersDarkMode) document.documentElement.classList.add('dark');
@@ -778,7 +778,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <Footer isDarkMode={isDarkMode} />
+            <Footer />
         </div>
     );
 }

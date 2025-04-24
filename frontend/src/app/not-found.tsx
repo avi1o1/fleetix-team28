@@ -20,7 +20,7 @@ export default function NotFound() {
             document.documentElement.classList.remove('dark');
         } else {
             // If no preference is set, check for system preference
-            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const prefersDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
             setIsDarkMode(prefersDarkMode);
             localStorage.setItem('theme', prefersDarkMode ? 'dark' : 'light');
             if (prefersDarkMode) document.documentElement.classList.add('dark');
@@ -92,7 +92,7 @@ export default function NotFound() {
 
                     <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-8">
                         <button
-                            onClick={() => window.history.back()}
+                            onClick={() => typeof window !== 'undefined' && window.history.back()}
                             className={`px-8 py-3 text-center border border-transparent text-base font-medium rounded-md ${isDarkMode ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'} md:py-4 md:text-lg md:px-10 transform hover:scale-105 transition-all duration-300 flex items-center`}
                         >
                             <ArrowLeft size={20} className="mr-2" />
