@@ -646,7 +646,7 @@ const ManageRoutes: React.FC = () => {
             // Fetch employee details
             const employeeData = await Promise.all(
                 selectedEmployees.map(async (id) => {
-                    const response = await fetch(`http://localhost:3001/employees/auth/employees/${id}`, {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/auth/employees/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
@@ -929,7 +929,7 @@ const ManageRoutes: React.FC = () => {
 
             const employeeData = await Promise.all(
                 selectedEmployees.map(async (id) => {
-                    const response = await fetch(`http://localhost:3001/employees/auth/employees/${id}`, {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/employees/auth/employees/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
