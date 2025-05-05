@@ -9,20 +9,17 @@ import Navbar from '@/components/Navbar';
 import LocationModal from '@/components/profile/LocationModal';
 import { v4 as uuidv4 } from 'uuid';
 
+// Import CSS for Leaflet
+import 'leaflet/dist/leaflet.css';
+
 // Dynamically import Leaflet with no SSR
 const LeafletMap = dynamic(
     () => import('@/components/LeafletMap'),
     { ssr: false }
 );
 
-// Dynamically import Leaflet library
-const L = dynamic(
-    () => import('leaflet').then(mod => mod.default),
-    { ssr: false }
-);
-
-// Import CSS in a way that works with SSR
-import 'leaflet/dist/leaflet.css';
+// Define L variable
+let L: any = null;
 
 const ManageRoutes: React.FC = () => {
     const mapRef = useRef<L.Map | null>(null);
@@ -61,6 +58,7 @@ const ManageRoutes: React.FC = () => {
 
     const [destination, setDestination] = useState<string>('');
     const [maxCabs, setMaxCabs] = useState<number>(5);
+    const [destinations, setDestinations] = useState<{ address: string; pickups: string[] }[]>([]);
 
     // Location modal states
     const [showLocationModal, setShowLocationModal] = useState<boolean>(false);
@@ -96,21 +94,27 @@ const ManageRoutes: React.FC = () => {
         // Only run on the client side
         if (typeof window === 'undefined') return;
 
-        if (mapContainerRef.current && !mapRef.current) {
-            mapRef.current = L.map(mapContainerRef.current).setView([51.505, -0.09], 13);
+        // Import Leaflet dynamically only on client-side
+        import('leaflet').then((leaflet) => {
+            // Assign the imported Leaflet to our L variable
+            L = leaflet.default;
+            
+            if (mapContainerRef.current && !mapRef.current) {
+                mapRef.current = L.map(mapContainerRef.current).setView([51.505, -0.09], 13);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-            }).addTo(mapRef.current);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                }).addTo(mapRef.current);
 
-            // Initialize layers
-            routeLayerRef.current = L.layerGroup().addTo(mapRef.current);
-            markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
+                // Initialize layers
+                routeLayerRef.current = L.layerGroup().addTo(mapRef.current);
+                markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
 
-            setTimeout(() => {
-                mapRef.current?.invalidateSize();
-            }, 200);
-        }
+                setTimeout(() => {
+                    mapRef.current?.invalidateSize();
+                }, 200);
+            }
+        });
 
         return () => {
             if (mapRef.current) {
@@ -282,7 +286,7 @@ const ManageRoutes: React.FC = () => {
     };
 
     // K-means clustering algorithm
-    const kMeansCluster = (points: { lat: number, lon: number }[], k: number, maxIterations = 100) => {
+    const kMeansCluster = (points: any[], k: number, maxIterations = 100) => {
         if (points.length <= k) {
             return points.map(point => [point]);
         }
@@ -629,7 +633,7 @@ const ManageRoutes: React.FC = () => {
         try {
             // Clear previous routes and markers
             if (routeLayerRef.current) routeLayerRef.current.clearLayers();
-            if (markersLayerRef.current) routeLayerRef.current.clearLayers();
+            if (markersLayerRef.current) markersLayerRef.current.clearLayers();
 
             // Ensure we're in browser environment
             if (typeof window === 'undefined') {
