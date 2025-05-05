@@ -1034,14 +1034,14 @@ const EmployeeRoutes: React.FC = () => {
                   </div>
                 )}
 
-                {/* Map - Fixed height */}
+                {/* Map visualization - Fixed height */}
                 <div className="w-full rounded-xl overflow-hidden border dark:border-gray-700 h-[400px] flex-shrink-0">
                   <LeafletMap
                     pickup={pickupPoint}
                     dropoff={dropoffPoint}
                     routeGeometry={routeGeometry}
                     routeColor={routeColor}
-                    waypoints={waypoints}
+                    allPoints={waypoints}
                   />
                 </div>
 
